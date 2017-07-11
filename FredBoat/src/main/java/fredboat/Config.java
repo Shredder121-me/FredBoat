@@ -90,6 +90,8 @@ public class Config {
     private final String sshPrivateKeyFile;
     private final int forwardToPort; //port where the remote database is listening, postgres default: 5432
 
+    private final String proxy;
+
     @SuppressWarnings("unchecked")
     public Config(File credentialsFile, File configFile, int scope) {
         try {
@@ -208,6 +210,8 @@ public class Config {
             sshUser = (String) creds.getOrDefault("sshUser", "fredboat");
             sshPrivateKeyFile = (String) creds.getOrDefault("sshPrivateKeyFile", "database.ppk");
             forwardToPort = (int) creds.getOrDefault("forwardToPort", 5432);
+
+            proxy = (String) config.get("proxy");
         } catch (IOException | UnirestException e) {
             throw new RuntimeException(e);
         }
@@ -378,5 +382,9 @@ public class Config {
 
     public int getForwardToPort() {
         return forwardToPort;
+    }
+
+    public String getProxy() {
+        return proxy;
     }
 }

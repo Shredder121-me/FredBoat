@@ -32,6 +32,7 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.beam.BeamAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
@@ -50,10 +51,14 @@ import fredboat.audio.source.PlaylistImportSourceManager;
 import fredboat.audio.source.SpotifyPlaylistSourceManager;
 import fredboat.util.constant.DistributionEnum;
 import net.dv8tion.jda.core.audio.AudioSendHandler;
+import org.apache.http.HttpHost;
+import org.apache.http.client.config.RequestConfig;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public abstract class AbstractPlayer extends AudioEventAdapter implements AudioSendHandler {
 
@@ -108,10 +113,18 @@ public abstract class AbstractPlayer extends AudioEventAdapter implements AudioS
         if (Config.CONFIG.getDistribution() == DistributionEnum.PATRON || Config.CONFIG.getDistribution() == DistributionEnum.DEVELOPMENT) {
             mng.registerSourceManager(new SpotifyPlaylistSourceManager());
         }
-        //add new source managers above the HttpAudio one, because it will either eat your request or throw an exception
-        //so you will never reach a source manager below it
-        // commented out to prevent leaking our ip
-//        mng.registerSourceManager(new HttpAudioSourceManager());
+        //If a proxy is set, turn on the direct HTTP(S) streaming
+        if (isEmpty(Config.CONFIG.getProxy())) {
+            //add new source managers above the HttpAudio one, because it will either eat your request or throw an exception
+            //so you will never reach a source manager below it
+            HttpAudioSourceManager httpAudioSourceManager = new HttpAudioSourceManager();
+            httpAudioSourceManager.configureRequests(config ->
+                RequestConfig.copy(config)
+                        .setProxy(HttpHost.create(Config.CONFIG.getProxy()))
+                        .build()
+            );
+            mng.registerSourceManager(httpAudioSourceManager);
+        }
         
         return mng;
     }
