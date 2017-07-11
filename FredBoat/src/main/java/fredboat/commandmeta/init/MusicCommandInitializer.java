@@ -93,6 +93,7 @@ public class MusicCommandInitializer {
         /* Bot Maintenance Commands */
         CommandRegistry.registerCommand("mgitinfo", new GitInfoCommand(), "mgit");
         CommandRegistry.registerCommand("munblacklist", new UnblacklistCommand(), "munlimit");
+        CommandRegistry.registerCommand("mfeatures", new FeaturesCommand());
         CommandRegistry.registerCommand("mexit", new ExitCommand());
         CommandRegistry.registerCommand("mbotrestart", new BotRestartCommand());
         CommandRegistry.registerCommand("mstats", new StatsCommand());

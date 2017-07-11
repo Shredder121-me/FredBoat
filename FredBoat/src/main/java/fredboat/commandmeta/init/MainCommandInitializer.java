@@ -54,6 +54,7 @@ public class MainCommandInitializer {
         CommandRegistry.registerCommand("revive", new ReviveCommand());
         CommandRegistry.registerCommand("test", new TestCommand());
         CommandRegistry.registerCommand("gitinfo", new GitInfoCommand(), "git");
+        CommandRegistry.registerCommand("features", new FeaturesCommand());
         CommandRegistry.registerCommand("exit", new ExitCommand());
         
         /* Moderation */
